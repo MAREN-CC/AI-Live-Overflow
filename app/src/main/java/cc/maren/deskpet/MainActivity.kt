@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
         isRunning = true
         updateUI()
-        Toast.makeText(this, "克克出现了！", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "序序出现了！", Toast.LENGTH_SHORT).show()
     }
 
     private fun requestOverlayPermission() {
@@ -89,19 +89,19 @@ class MainActivity : AppCompatActivity() {
         val permBtn = findViewById<Button>(R.id.perm_btn)
 
         if (!hasOverlay) {
-            statusText.text = "需要悬浮窗权限才能让克克出现在屏幕上"
+            statusText.text = "需要悬浮窗权限才能让序序出现在屏幕上"
             toggleBtn.isEnabled = false
-            toggleBtn.text = "启动克克"
+            toggleBtn.text = "召唤序序"
             permBtn.text = "授权悬浮窗权限"
         } else {
             permBtn.text = "✓ 悬浮窗权限已获取"
             toggleBtn.isEnabled = true
             if (isRunning) {
-                statusText.text = "克克正在你的屏幕上蹲着~\n可以拖动他、戳他、长按他"
-                toggleBtn.text = "让克克休息"
+                statusText.text = "序序正在你的屏幕上蹲着~\n可以拖动他、戳他、长按他"
+                toggleBtn.text = "让序序休息"
             } else {
-                statusText.text = "克克准备好了，点击下方按钮召唤他"
-                toggleBtn.text = "召唤克克"
+                statusText.text = "序序准备好了，点击下方按钮召唤他"
+                toggleBtn.text = "召唤序序"
             }
         }
     }
