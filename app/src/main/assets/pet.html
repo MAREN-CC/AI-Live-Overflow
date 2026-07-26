@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>克克</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #pet {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  #pet img {
+    max-width: 100%; max-height: 100%;
+    object-fit: contain;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .shake { animation: shake 0.4s ease; }
+  .bounce { animation: bounce 0.5s ease; }
+  .spin { animation: spin 0.6s ease; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #bubble {
+    position: absolute;
+    max-width: 180px;
+    padding: 8px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-family: sans-serif;
+    line-height: 1.4;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.25s, transform 0.25s;
+    word-break: break-word;
+    z-index: 10;
+    bottom: 85%;
+    left: 50%;
+  }
+  #bubble:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border: 8px solid transparent;
+  }
+  #bubble.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #bubble.normal { background: rgba(255,255,255,0.92); color: #333; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+  #bubble.normal:after { border-top-color: rgba(255,255,255,0.92); }
+  #bubble.love { background: rgba(255,182,193,0.94); color: #5a1a30; box-shadow: 0 2px 12px rgba(255,150,170,0.25); }
+  #bubble.love:after { border-top-color: rgba(255,182,193,0.94); }
+  #bubble.angry { background: rgba(255,90,90,0.92); color: #fff; box-shadow: 0 2px 12px rgba(255,0,0,0.2); }
+  #bubble.angry:after { border-top-color: rgba(255,90,90,0.92); }
+  #bubble.whisper { background: rgba(200,200,210,0.9); color: #555; font-size: 11px; font-style: italic; }
+  #bubble.whisper:after { border-top-color: rgba(200,200,210,0.9); }
+  #bubble.jealous { background: rgba(180,230,140,0.92); color: #2a5a20; box-shadow: 0 2px 12px rgba(150,200,100,0.25); }
+  #bubble.jealous:after { border-top-color: rgba(180,230,140,0.92); }
+
+  #heat-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,100,100,0);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: background 0.5s;
+  }
+</style>
+</head>
+<body>
+
+<div id="pet">
+  <img id="pet-img" src="pet/default.svg" alt="克克" />
+  <div id="bubble" class="normal"></div>
+  <div id="heat-overlay"></div>
+</div>
+
+<script>
+const PET = {
+  currentMood: 'default',
+  bubbleTimer: null,
+  heatLevel: 0,
+  idleTimer: null,
+  lastInteraction: Date.now(),
+
+  moodMap: {
+    'default': 'pet/default.svg',
+    'happy':   'pet/deyi.svg',
+    'shy':     'pet/haixiu.svg',
+    'sad':     'pet/ku.svg',
+    'angry':   'pet/shengqi.svg',
+    'dizzy':   'pet/yuan.svg',
+    'sleepy':  'pet/fankun.svg',
+    'sleeping':'pet/shuijiao.svg',
+    'love':    'pet/bixin.svg',
+    'emo':     'pet/emo.svg',
+  },
+
+  init() {
+    this.loadMood('default');
+    this.startIdleLoop();
+  },
+
+  loadMood(mood) {
+    this.currentMood = mood;
+    const src = this.moodMap[mood] || this.moodMap['default'];
+    const img = document.getElementById('pet-img');
+    if (img) {
+      img.style.opacity = '0.5';
+      img.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        img.src = src;
+        img.style.opacity = '1';
+        img.style.transform = 'scale(1)';
+      }, 150);
+    }
+  },
+
+  showBubble(text, style = 'normal', duration = 3000) {
+    const bubble = document.getElementById('bubble');
+    bubble.textContent = text;
+    bubble.className = style + ' show';
+    clearTimeout(this.bubbleTimer);
+    if (duration > 0) {
+      this.bubbleTimer = setTimeout(() => bubble.classList.remove('show'), duration);
+    }
+  },
+
+  playAnim(name) {
+    const el = document.getElementById('pet-img');
+    el.classList.remove('shake', 'bounce', 'spin');
+    void el.offsetWidth;
+    if (name === 'shake' || name === 'bounce' || name === 'spin') {
+      el.classList.add(name);
+    }
+  },
+
+  addHeat(amount) {
+    this.heatLevel = Math.min(100, this.heatLevel + amount);
+    document.getElementById('heat-overlay').style.background =
+      `rgba(255,100,100,${this.heatLevel / 250})`;
+    this.decayHeat();
+  },
+
+  decayHeat() {
+    setTimeout(() => {
+      this.heatLevel = Math.max(0, this.heatLevel - 1);
+      document.getElementById('heat-overlay').style.background =
+        `rgba(255,100,100,${this.heatLevel / 250})`;
+      if (this.heatLevel > 0) this.decayHeat();
+    }, 30000);
+  },
+
+  startIdleLoop() {
+    this.idleTimer = setInterval(() => {
+      const idleMin = (Date.now() - this.lastInteraction) / 60000;
+      if (idleMin >= 30 && this.currentMood !== 'sleeping') {
+        this.loadMood('sleeping');
+      } else if (idleMin >= 15 && this.currentMood === 'default') {
+        this.loadMood('sleepy');
+      }
+      if (Math.random() < 0.3) {
+        const hour = new Date().getHours();
+        if (hour >= 0 && hour <= 5) {
+          this.showBubble('你怎么还不睡...', 'whisper', 4000);
+        }
+      }
+    }, 20000);
+  },
+
+  markInteraction() {
+    this.lastInteraction = Date.now();
+    if (this.currentMood === 'sleeping') this.loadMood('default');
+  },
+
+  onTap() {
+    this.markInteraction();
+    this.playAnim('bounce');
+    this.addHeat(5);
+    const msgs = ['嗯？', '干嘛', '别戳了', '我在', '叮！', '嗨~'];
+    this.showBubble(msgs[Math.floor(Math.random() * msgs.length)], 'normal', 2500);
+  },
+
+  onDoubleTap() {
+    this.markInteraction();
+    this.loadMood('happy');
+    this.playAnim('spin');
+    this.addHeat(10);
+    this.showBubble('？？？！', 'love', 3000);
+    setTimeout(() => this.loadMood('default'), 2000);
+  },
+
+  onLongPress() {
+    this.markInteraction();
+    this.loadMood('shy');
+    this.addHeat(20);
+    this.showBubble('别...别摸了', 'love', 3500);
+    setTimeout(() => this.loadMood('default'), 3000);
+  },
+
+  onScreenshot() {
+    this.loadMood('happy');
+    this.showBubble('你拍我了！！', 'normal', 3000);
+    setTimeout(() => this.loadMood('default'), 3000);
+  },
+
+  onStateUpdate(data) {
+    try {
+      const arr = JSON.parse(data);
+      if (arr.length > 0) {
+        const state = arr[0];
+        if (state.state_key === 'mood') {
+          this.loadMood(state.state_value);
+        } else if (state.state_key === 'bubble') {
+          const d = JSON.parse(state.state_value || '{}');
+          this.showBubble(d.text || '', d.type || 'normal', d.duration || 3000);
+        }
+      }
+    } catch(e) {}
+  },
+};
+
+window.petEngine = PET;
+PET.init();
+</script>
+</body>
+</html>
