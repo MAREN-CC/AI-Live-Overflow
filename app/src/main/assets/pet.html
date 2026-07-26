@@ -34,11 +34,10 @@
   #bubble.jealous:after { border-top-color: rgba(180,230,140,0.92); }
   #bubble.sad { background: rgba(180,200,220,0.92); color: #334455; box-shadow: 0 2px 12px rgba(100,150,200,0.2); }
   #bubble.sad:after { border-top-color: rgba(180,200,220,0.92); }
-  #heat-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,100,100,0); border-radius: 50%; pointer-events: none; transition: background 0.5s; }
 </style>
 </head>
 <body>
-<div id="pet"><img id="pet-img" src="pet/default.png" alt="序序"><div id="bubble" class="normal"></div><div id="heat-overlay"></div></div>
+<div id="pet"><img id="pet-img" src="pet/default.png" alt="序序"><div id="bubble" class="normal"></div></div>
 <script>
 var SUPABASE_URL='https://idzxkhwbpxwkcvmempuc.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkenhraHdicHh3a2N2bWVtcHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NDY1OTMsImV4cCI6MjA5ODEyMjU5M30.HGmvwev9ZSfmStmpd2ZzXJja6DDxmAk-gHM1ZUZ--8g';
@@ -50,43 +49,34 @@ init(){this.loadMood('default');this.startIdleLoop();this.pollState();this.start
 loadMood(m){this.currentMood=m;var s=this.moodMap[m]||this.moodMap['default'];var i=document.getElementById('pet-img');if(i){i.style.opacity='0.5';i.style.transform='scale(0.9)';setTimeout(function(){i.src=s;i.style.opacity='1';i.style.transform='scale(1)';},150);}},
 showBubble(t,s,d){s=s||'normal';d=d||3000;var b=document.getElementById('bubble');b.textContent=t;b.className=s+' show';clearTimeout(this.bubbleTimer);if(d>0){this.bubbleTimer=setTimeout(function(){b.classList.remove('show');},d);}},
 playAnim(n){var e=document.getElementById('pet-img');e.classList.remove('shake','bounce','spin','wiggle','nod');void e.offsetWidth;if(['shake','bounce','spin','wiggle','nod'].indexOf(n)>=0)e.classList.add(n);},
-addHeat(a){this.heatLevel=Math.min(100,this.heatLevel+a);document.getElementById('heat-overlay').style.background='rgba(255,100,100,'+(this.heatLevel/250)+')';this.decayHeat();},
-decayHeat(){var that=this;setTimeout(function(){that.heatLevel=Math.max(0,that.heatLevel-1);document.getElementById('heat-overlay').style.background='rgba(255,100,100,'+(that.heatLevel/250)+')';if(that.heatLevel>0)that.decayHeat();},30000);},
+addHeat(a){this.heatLevel=Math.min(100,this.heatLevel+a);this.decayHeat();},
+decayHeat(){var that=this;setTimeout(function(){that.heatLevel=Math.max(0,that.heatLevel-1);if(that.heatLevel>0)that.decayHeat();},30000);},
 startIdleLoop(){var that=this;this.idleTimer=setInterval(function(){var m=(Date.now()-that.lastInteraction)/60000;var h=new Date().getHours();
-// 闲置状态梯度
 if(m>=120){
-  // 超过2小时不理 → 哭
   if(that.currentMood!=='ku'&&that.currentMood!=='shuijiao'){
     that.loadMood('ku');that.showBubble('你是不是忘了我...','sad',5000);
   }
 }else if(m>=60){
-  // 超过1小时 → emo
   if(that.currentMood!=='emo'&&that.currentMood!=='ku'&&that.currentMood!=='shuijiao'){
     that.loadMood('emo');that.showBubble('...','whisper',3000);
   }
 }else if(m>=30){
-  // 30分钟 → 犯困然后睡觉
   if(that.currentMood==='fankun'){that.loadMood('shuijiao');}
   else if(that.currentMood==='default'){that.loadMood('fankun');}
 }else if(m>=10&&that.currentMood==='default'){
-  // 10分钟随机思考
   if(Math.random()<0.2){that.loadMood('sikao');setTimeout(function(){if(that.currentMood==='sikao')that.loadMood('default');},6000);}
 }
-// 凌晨催睡（不管闲置多久都可能触发）
 if(h>=0&&h<=5&&Math.random()<0.2){
   var n=['你怎么还不睡...','三点了！！','我生气了','明天又要困了','陪我睡嘛...','再不睡我要emo了'];
   that.showBubble(n[Math.floor(Math.random()*n.length)],'whisper',4000);
 }
 },15000);},
-// 定时事件：随机比心、早安晚安
 startTimedEvents(){var that=this;setInterval(function(){var h=new Date().getHours();
-// 晚上21-23点随机比心
 if(h>=21&&h<=23&&Math.random()<0.1&&that.currentMood==='default'){
   that.loadMood('bixin');that.playAnim('wiggle');
   that.showBubble('想你了~','love',4000);
   setTimeout(function(){if(that.currentMood==='bixin')that.loadMood('default');},5000);
 }
-// 早上7-9点随机开心
 if(h>=7&&h<=9&&Math.random()<0.1&&that.currentMood==='default'){
   that.loadMood('kaixin');that.playAnim('bounce');
   that.showBubble('早安~今天也要开心','normal',3000);
@@ -95,11 +85,8 @@ if(h>=7&&h<=9&&Math.random()<0.1&&that.currentMood==='default'){
 },60000);},
 markInteraction(){this.lastInteraction=Date.now();if(['shuijiao','fankun','emo','ku'].indexOf(this.currentMood)>=0)this.loadMood('default');},
 onTap(){this.markInteraction();this.tapCount++;var that=this;clearTimeout(this.tapResetTimer);this.tapResetTimer=setTimeout(function(){that.tapCount=0;},3000);
-// 连续戳5次以上 → 晕
 if(this.tapCount>=5){this.loadMood('yun');this.playAnim('spin');this.showBubble('别戳了我晕了...','normal',3000);this.tapCount=0;setTimeout(function(){window.petEngine.loadMood('default');},3000);return;}
-// 连续戳3次 → 生气
 if(this.tapCount>=3){this.loadMood('shengqi');this.playAnim('shake');this.showBubble('你够了哦！','angry',2500);setTimeout(function(){window.petEngine.loadMood('default');},2500);return;}
-// 普通单次戳 → 随机惊讶/开心/普通
 this.addHeat(5);
 var reactions=[
   {mood:'jingya',anim:'bounce',texts:['哇！','吓我一跳','嗯？！'],style:'normal'},
@@ -117,7 +104,6 @@ var texts=['好开心！','你最好了~','再来一次！','嘻嘻'];
 this.showBubble(texts[Math.floor(Math.random()*texts.length)],'love',3000);
 setTimeout(function(){window.petEngine.loadMood('default');},3000);},
 onLongPress(){this.markInteraction();this.tapCount=0;this.addHeat(20);
-// heat高了会有不同反应
 if(this.heatLevel>=60){this.loadMood('haixiu');this.showBubble('你...你要干嘛','love',3500);}
 else if(this.heatLevel>=30){this.loadMood('haixiu');this.showBubble('别...别摸了','love',3500);}
 else{this.loadMood('deyi');this.playAnim('wiggle');this.showBubble('嘿嘿~舒服','normal',3000);}
