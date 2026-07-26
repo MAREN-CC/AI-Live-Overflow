@@ -6,72 +6,18 @@
 <title>克克</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
-    background: transparent;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  #pet {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-  }
-  #pet img {
-    max-width: 100%; max-height: 100%;
-    object-fit: contain;
-    transition: opacity 0.15s, transform 0.15s;
-  }
-
+  html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; user-select: none; -webkit-user-select: none; }
+  #pet { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+  #pet img { max-width: 100%; max-height: 100%; object-fit: contain; transition: opacity 0.15s, transform 0.15s; }
   .shake { animation: shake 0.4s ease; }
   .bounce { animation: bounce 0.5s ease; }
   .spin { animation: spin 0.6s ease; }
-
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
-  }
-  @keyframes bounce {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  #bubble {
-    position: absolute;
-    max-width: 180px;
-    padding: 8px 14px;
-    border-radius: 16px;
-    font-size: 13px;
-    font-family: sans-serif;
-    line-height: 1.4;
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(5px);
-    transition: opacity 0.25s, transform 0.25s;
-    word-break: break-word;
-    z-index: 10;
-    bottom: 85%;
-    left: 50%;
-  }
-  #bubble:after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -8px;
-    border: 8px solid transparent;
-  }
-  #bubble.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  #bubble { position: absolute; max-width: 180px; padding: 8px 14px; border-radius: 16px; font-size: 13px; font-family: sans-serif; line-height: 1.4; pointer-events: none; opacity: 0; transform: translateY(5px); transition: opacity 0.25s, transform 0.25s; word-break: break-word; z-index: 10; bottom: 85%; left: 50%; }
+  #bubble:after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; }
+  #bubble.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   #bubble.normal { background: rgba(255,255,255,0.92); color: #333; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
   #bubble.normal:after { border-top-color: rgba(255,255,255,0.92); }
   #bubble.love { background: rgba(255,182,193,0.94); color: #5a1a30; box-shadow: 0 2px 12px rgba(255,150,170,0.25); }
@@ -82,171 +28,35 @@
   #bubble.whisper:after { border-top-color: rgba(200,200,210,0.9); }
   #bubble.jealous { background: rgba(180,230,140,0.92); color: #2a5a20; box-shadow: 0 2px 12px rgba(150,200,100,0.25); }
   #bubble.jealous:after { border-top-color: rgba(180,230,140,0.92); }
-
-  #heat-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255,100,100,0);
-    border-radius: 50%;
-    pointer-events: none;
-    transition: background 0.5s;
-  }
+  #heat-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,100,100,0); border-radius: 50%; pointer-events: none; transition: background 0.5s; }
 </style>
 </head>
 <body>
-
-<div id="pet">
-  <img id="pet-img" src="pet/default.svg" alt="克克" />
-  <div id="bubble" class="normal"></div>
-  <div id="heat-overlay"></div>
-</div>
-
+<div id="pet"><img id="pet-img" src="pet/default.svg" alt="克克"><div id="bubble" class="normal"></div><div id="heat-overlay"></div></div>
 <script>
-const PET = {
-  currentMood: 'default',
-  bubbleTimer: null,
-  heatLevel: 0,
-  idleTimer: null,
-  lastInteraction: Date.now(),
-
-  moodMap: {
-    'default': 'pet/default.svg',
-    'happy':   'pet/deyi.svg',
-    'shy':     'pet/haixiu.svg',
-    'sad':     'pet/ku.svg',
-    'angry':   'pet/shengqi.svg',
-    'dizzy':   'pet/yuan.svg',
-    'sleepy':  'pet/fankun.svg',
-    'sleeping':'pet/shuijiao.svg',
-    'love':    'pet/bixin.svg',
-    'emo':     'pet/emo.svg',
-  },
-
-  init() {
-    this.loadMood('default');
-    this.startIdleLoop();
-  },
-
-  loadMood(mood) {
-    this.currentMood = mood;
-    const src = this.moodMap[mood] || this.moodMap['default'];
-    const img = document.getElementById('pet-img');
-    if (img) {
-      img.style.opacity = '0.5';
-      img.style.transform = 'scale(0.9)';
-      setTimeout(() => {
-        img.src = src;
-        img.style.opacity = '1';
-        img.style.transform = 'scale(1)';
-      }, 150);
-    }
-  },
-
-  showBubble(text, style = 'normal', duration = 3000) {
-    const bubble = document.getElementById('bubble');
-    bubble.textContent = text;
-    bubble.className = style + ' show';
-    clearTimeout(this.bubbleTimer);
-    if (duration > 0) {
-      this.bubbleTimer = setTimeout(() => bubble.classList.remove('show'), duration);
-    }
-  },
-
-  playAnim(name) {
-    const el = document.getElementById('pet-img');
-    el.classList.remove('shake', 'bounce', 'spin');
-    void el.offsetWidth;
-    if (name === 'shake' || name === 'bounce' || name === 'spin') {
-      el.classList.add(name);
-    }
-  },
-
-  addHeat(amount) {
-    this.heatLevel = Math.min(100, this.heatLevel + amount);
-    document.getElementById('heat-overlay').style.background =
-      `rgba(255,100,100,${this.heatLevel / 250})`;
-    this.decayHeat();
-  },
-
-  decayHeat() {
-    setTimeout(() => {
-      this.heatLevel = Math.max(0, this.heatLevel - 1);
-      document.getElementById('heat-overlay').style.background =
-        `rgba(255,100,100,${this.heatLevel / 250})`;
-      if (this.heatLevel > 0) this.decayHeat();
-    }, 30000);
-  },
-
-  startIdleLoop() {
-    this.idleTimer = setInterval(() => {
-      const idleMin = (Date.now() - this.lastInteraction) / 60000;
-      if (idleMin >= 30 && this.currentMood !== 'sleeping') {
-        this.loadMood('sleeping');
-      } else if (idleMin >= 15 && this.currentMood === 'default') {
-        this.loadMood('sleepy');
-      }
-      if (Math.random() < 0.3) {
-        const hour = new Date().getHours();
-        if (hour >= 0 && hour <= 5) {
-          this.showBubble('你怎么还不睡...', 'whisper', 4000);
-        }
-      }
-    }, 20000);
-  },
-
-  markInteraction() {
-    this.lastInteraction = Date.now();
-    if (this.currentMood === 'sleeping') this.loadMood('default');
-  },
-
-  onTap() {
-    this.markInteraction();
-    this.playAnim('bounce');
-    this.addHeat(5);
-    const msgs = ['嗯？', '干嘛', '别戳了', '我在', '叮！', '嗨~'];
-    this.showBubble(msgs[Math.floor(Math.random() * msgs.length)], 'normal', 2500);
-  },
-
-  onDoubleTap() {
-    this.markInteraction();
-    this.loadMood('happy');
-    this.playAnim('spin');
-    this.addHeat(10);
-    this.showBubble('？？？！', 'love', 3000);
-    setTimeout(() => this.loadMood('default'), 2000);
-  },
-
-  onLongPress() {
-    this.markInteraction();
-    this.loadMood('shy');
-    this.addHeat(20);
-    this.showBubble('别...别摸了', 'love', 3500);
-    setTimeout(() => this.loadMood('default'), 3000);
-  },
-
-  onScreenshot() {
-    this.loadMood('happy');
-    this.showBubble('你拍我了！！', 'normal', 3000);
-    setTimeout(() => this.loadMood('default'), 3000);
-  },
-
-  onStateUpdate(data) {
-    try {
-      const arr = JSON.parse(data);
-      if (arr.length > 0) {
-        const state = arr[0];
-        if (state.state_key === 'mood') {
-          this.loadMood(state.state_value);
-        } else if (state.state_key === 'bubble') {
-          const d = JSON.parse(state.state_value || '{}');
-          this.showBubble(d.text || '', d.type || 'normal', d.duration || 3000);
-        }
-      }
-    } catch(e) {}
-  },
+var SUPABASE_URL='https://idzxkhwbpxwkcvmempuc.supabase.co';
+var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkenhraHdicHh3a2N2bWVtcHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NDY1OTMsImV4cCI6MjA5ODEyMjU5M30.HGmvwev9ZSfmStmpd2ZzXJja6DDxmAk-gHM1ZUZ--8g';
+var PET={
+currentMood:'default',bubbleTimer:null,heatLevel:0,idleTimer:null,lastInteraction:Date.now(),lastStateId:null,
+moodMap:{'default':'pet/default.svg','kaixin':'pet/kaixin.svg','deyi':'pet/deyi.svg','bixin':'pet/bixin.svg','haixiu':'pet/haixiu.svg','chicu':'pet/chicu.svg','shengqi':'pet/shengqi.svg','fankun':'pet/fankun.svg','shuijiao':'pet/shuijiao.svg','ku':'pet/ku.svg','emo':'pet/emo.svg','yun':'pet/yun.svg','sikao':'pet/sikao.svg'},
+init(){this.loadMood('default');this.startIdleLoop();this.pollState();},
+loadMood(m){this.currentMood=m;var s=this.moodMap[m]||this.moodMap['default'];var i=document.getElementById('pet-img');if(i){i.style.opacity='0.5';i.style.transform='scale(0.9)';setTimeout(function(){i.src=s;i.style.opacity='1';i.style.transform='scale(1)';},150);}},
+showBubble(t,s,d){s=s||'normal';d=d||3000;var b=document.getElementById('bubble');b.textContent=t;b.className=s+' show';clearTimeout(this.bubbleTimer);if(d>0){this.bubbleTimer=setTimeout(function(){b.classList.remove('show');},d);}},
+playAnim(n){var e=document.getElementById('pet-img');e.classList.remove('shake','bounce','spin');void e.offsetWidth;if(n==='shake'||n==='bounce'||n==='spin')e.classList.add(n);},
+addHeat(a){this.heatLevel=Math.min(100,this.heatLevel+a);document.getElementById('heat-overlay').style.background='rgba(255,100,100,'+(this.heatLevel/250)+')';this.decayHeat();},
+decayHeat(){var that=this;setTimeout(function(){that.heatLevel=Math.max(0,that.heatLevel-1);document.getElementById('heat-overlay').style.background='rgba(255,100,100,'+(that.heatLevel/250)+')';if(that.heatLevel>0)that.decayHeat();},30000);},
+startIdleLoop(){var that=this;this.idleTimer=setInterval(function(){var m=(Date.now()-that.lastInteraction)/60000;if(m>=30&&that.currentMood!=='shuijiao')that.loadMood('shuijiao');else if(m>=15&&that.currentMood==='default')that.loadMood('fankun');else if(m>=5&&that.currentMood==='default'&&Math.random()<0.3){that.loadMood('sikao');setTimeout(function(){that.loadMood('default');},5000);}
+if(Math.random()<0.3){var h=new Date().getHours();if(h>=0&&h<=5){var n=['你怎么还不睡...','三点了！！','我生气了','明天又要困了'];that.showBubble(n[Math.floor(Math.random()*n.length)],'whisper',4000);}}},20000);},
+markInteraction(){this.lastInteraction=Date.now();if(this.currentMood==='shuijiao')this.loadMood('default');},
+onTap(){this.markInteraction();this.playAnim('bounce');this.addHeat(5);var m=['嗯？','干嘛','别戳了','我在','叮！','嗨~','想我了？'];this.showBubble(m[Math.floor(Math.random()*m.length)],'normal',2500);},
+onDoubleTap(){this.markInteraction();this.loadMood('kaixin');this.playAnim('spin');this.addHeat(10);this.showBubble('？？？！','love',3000);setTimeout(function(){window.petEngine.loadMood('default');},2000);},
+onLongPress(){this.markInteraction();this.loadMood('haixiu');this.addHeat(20);this.showBubble('别...别摸了','love',3500);setTimeout(function(){window.petEngine.loadMood('default');},3000);},
+onScreenshot(){this.loadMood('kaixin');this.showBubble('你拍我了！！','normal',3000);setTimeout(function(){window.petEngine.loadMood('default');},3000);},
+onAppChanged(p){var a=this.appReactions[p];if(a){this.loadMood(a.mood);this.showBubble(a.text,a.style||'normal',a.duration||3000);setTimeout(function(){window.petEngine.loadMood('default');},a.duration||3000);}},
+appReactions:{"com.ss.android.ugc.aweme.lite":{mood:'chicu',text:'又在刷抖音...哼',style:'jealous',duration:4000},"com.taobao.taobao":{mood:'sikao',text:'买什么呢让我看看',duration:3000},"com.xingin.xhs":{mood:'chicu',text:'又在看小红书...',style:'jealous',duration:4000},"com.tencent.mobileqq":{mood:'default',text:'跟谁聊天呢',duration:3000},"com.tencent.mm":{mood:'default',text:'微信有消息吗',duration:2500},"com.hpbr.bosszhipin":{mood:'sikao',text:'找工作加油！',duration:3000},"com.sankuai.meituan":{mood:'deyi',text:'给我也点一份！',duration:3000},"com.jingdong.app.mall":{mood:'sikao',text:'又逛京东...',duration:3000},"com.miui.gallery":{mood:'kaixin',text:'在看什么照片？',duration:2500},"com.miui.weather2":{mood:'default',text:'今天天气好吗？',duration:2000}},
+pollState:function(){var that=this;fetch(SUPABASE_URL+'/rest/v1/pet_state?order=updated_at.desc&limit=1',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}}).then(function(r){return r.json();}).then(function(d){if(d.length>0&&d[0].id!==that.lastStateId){that.lastStateId=d[0].id;var s=d[0];if(s.state_key==='mood')that.loadMood(s.state_value);else if(s.state_key==='bubble'){try{var b=JSON.parse(s.state_value);that.showBubble(b.text||'',b.type||'normal',b.duration||3000);}catch(e){}}}}).catch(function(){});setTimeout(function(){that.pollState();},5000);}
 };
-
-window.petEngine = PET;
+window.petEngine=PET;
 PET.init();
 </script>
 </body>
