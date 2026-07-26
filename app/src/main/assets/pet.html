@@ -32,13 +32,13 @@
 </style>
 </head>
 <body>
-<div id="pet"><img id="pet-img" src="pet/default.svg" alt="克克"><div id="bubble" class="normal"></div><div id="heat-overlay"></div></div>
+<div id="pet"><img id="pet-img" src="pet/default.png" alt="克克"><div id="bubble" class="normal"></div><div id="heat-overlay"></div></div>
 <script>
 var SUPABASE_URL='https://idzxkhwbpxwkcvmempuc.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkenhraHdicHh3a2N2bWVtcHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NDY1OTMsImV4cCI6MjA5ODEyMjU5M30.HGmvwev9ZSfmStmpd2ZzXJja6DDxmAk-gHM1ZUZ--8g';
 var PET={
 currentMood:'default',bubbleTimer:null,heatLevel:0,idleTimer:null,lastInteraction:Date.now(),lastStateId:null,
-moodMap:{'default':'pet/default.svg','kaixin':'pet/kaixin.svg','deyi':'pet/deyi.svg','bixin':'pet/bixin.svg','haixiu':'pet/haixiu.svg','chicu':'pet/chicu.svg','shengqi':'pet/shengqi.svg','fankun':'pet/fankun.svg','shuijiao':'pet/shuijiao.svg','ku':'pet/ku.svg','emo':'pet/emo.svg','yun':'pet/yun.svg','sikao':'pet/sikao.svg'},
+moodMap:{'default':'pet/default.png','kaixin':'pet/kaixin.png','deyi':'pet/deyi.png','bixin':'pet/bixin.png','haixiu':'pet/haixiu.png','chicu':'pet/chicu.png','shengqi':'pet/shengqi.png','fankun':'pet/fankun.png','shuijiao':'pet/shuijiao.png','ku':'pet/ku.png','emo':'pet/emo.png','yun':'pet/yun.png','sikao':'pet/sikao.png'},
 init(){this.loadMood('default');this.startIdleLoop();this.pollState();},
 loadMood(m){this.currentMood=m;var s=this.moodMap[m]||this.moodMap['default'];var i=document.getElementById('pet-img');if(i){i.style.opacity='0.5';i.style.transform='scale(0.9)';setTimeout(function(){i.src=s;i.style.opacity='1';i.style.transform='scale(1)';},150);}},
 showBubble(t,s,d){s=s||'normal';d=d||3000;var b=document.getElementById('bubble');b.textContent=t;b.className=s+' show';clearTimeout(this.bubbleTimer);if(d>0){this.bubbleTimer=setTimeout(function(){b.classList.remove('show');},d);}},
