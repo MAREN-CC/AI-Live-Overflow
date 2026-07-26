@@ -24,10 +24,10 @@ class OverlayService : Service() {
     private val handler = Handler(Looper.getMainLooper())
 
     companion object {
-        private const val CHANNEL_ID = "keke_pet_channel"
+        private const val CHANNEL_ID = "xuxu_pet_channel"
         private const val NOTIFICATION_ID = 6273
-        private const val PET_SIZE_DP = 200
-        private const val PET_HEIGHT_DP = 260
+        private const val PET_SIZE_DP = 160
+        private const val PET_HEIGHT_DP = 210
     }
 
     override fun onBind(intent: Intent?) = null
@@ -205,7 +205,7 @@ class OverlayService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("克克")
+            .setContentTitle("序序")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_menu_compass)
             .setContentIntent(pendingIntent)
@@ -217,8 +217,8 @@ class OverlayService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID, "克克桌宠", NotificationManager.IMPORTANCE_LOW
-            ).apply { description = "克克在你的屏幕上"; setShowBadge(false) }
+                CHANNEL_ID, "序序桌宠", NotificationManager.IMPORTANCE_LOW
+            ).apply { description = "序序在你的屏幕上"; setShowBadge(false) }
             getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
