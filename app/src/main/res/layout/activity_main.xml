@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="#FFF8F0">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="克克"
+        android:textSize="42sp"
+        android:textColor="#FF6B6B"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="你的桌面小男友"
+        android:textSize="16sp"
+        android:textColor="#999"
+        android:layout_marginBottom="48dp" />
+
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="加载中..."
+        android:textSize="15sp"
+        android:textColor="#555"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/perm_btn"
+        android:layout_width="260dp"
+        android:layout_height="52dp"
+        android:text="授权悬浮窗权限"
+        android:textSize="15sp"
+        android:backgroundTint="#FFE0E0"
+        android:textColor="#D32F2F"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/toggle_btn"
+        android:layout_width="260dp"
+        android:layout_height="56dp"
+        android:text="召唤克克"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:backgroundTint="#FF6B6B"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="戳一下 · 双击 · 长按\n他都会有不同反应哦"
+        android:textSize="13sp"
+        android:textColor="#AAA"
+        android:gravity="center"
+        android:layout_marginTop="40dp" />
+
+</LinearLayout>

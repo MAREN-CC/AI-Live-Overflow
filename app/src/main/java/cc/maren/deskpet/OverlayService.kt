@@ -41,6 +41,7 @@ class OverlayService : Service() {
         startWhisperRotation()
     }
 
+    @Suppress("DEPRECATION")
     private fun setupOverlay() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
@@ -60,11 +61,17 @@ class OverlayService : Service() {
 
         overlayView = WebView(this).apply {
             setBackgroundColor(0x00000000)
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 allowFileAccess = true
+                allowFileAccessFromFileURLs = true
+                allowUniversalAccessFromFileURLs = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
                 cacheMode = WebSettings.LOAD_DEFAULT
+                setSupportZoom(false)
             }
             webViewClient = WebViewClient()
             loadUrl("file:///android_asset/pet.html")
